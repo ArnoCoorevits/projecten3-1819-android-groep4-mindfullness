@@ -1,8 +1,8 @@
 package com.groep4.mindfulness.utils
 
-import android.support.design.widget.TextInputLayout
 import android.util.Patterns
 import android.widget.EditText
+import com.google.android.material.textfield.TextInputLayout
 import java.util.regex.Pattern
 
 class LoginValidation {

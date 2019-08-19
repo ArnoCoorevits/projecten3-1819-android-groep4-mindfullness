@@ -2,12 +2,12 @@ package com.groep4.mindfulness.fragments
 
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
 import com.badoualy.stepperindicator.StepperIndicator
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.adapters.OefeningenPagerAdapter
@@ -55,7 +55,7 @@ class FragmentSessiePageOefeningen : Fragment() {
             pager.offscreenPageLimit = oefeningen.size
 
 
-            stepper.setViewPager(pager, (pager.adapter as OefeningenPagerAdapter).count)
+            stepper.setViewPager(pager, (pager.adapter as OefeningenPagerAdapter).getCount()    )
 
             // Audioplayer
             mp = MediaPlayer.create(context, R.raw.ademmeditatie)

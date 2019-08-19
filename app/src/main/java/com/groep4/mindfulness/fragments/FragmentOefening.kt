@@ -6,13 +6,13 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.*
+import androidx.fragment.app.Fragment
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.interfaces.CallbackInterface
 import com.groep4.mindfulness.model.Oefening
@@ -71,7 +71,7 @@ class FragmentOefening : Fragment() {
         if (oefening.fileMimeType == "application/pdf"){
             wvPDF!!.visibility = View.VISIBLE
             wvPDF!!.settings.javaScriptEnabled = true
-            wvPDF!!.loadUrl("https://docs.google.com/gview?embedded=true&url=http://141.134.155.219:3000/oefeningen/files/" + oefening.fileUrl)
+            wvPDF!!.loadUrl(oefening.url)
         }
 
         // Toont afbeelding als oefening jpgbestand is
@@ -80,18 +80,18 @@ class FragmentOefening : Fragment() {
 
 
             Ion.with(ivOefening)
-                    .load("http://141.134.155.219:3000/oefeningen/files/" + oefening.fileUrl)
+                    .load(oefening.url)
 
             ivOefening!!.setOnClickListener{
-                val i = Intent(android.content.Intent.ACTION_VIEW)
-                i.setDataAndType(Uri.parse("http://141.134.155.219:3000/oefeningen/files/" + oefening.fileUrl), "image/jpg")
+                val i = Intent(Intent.ACTION_VIEW)
+                i.setDataAndType(Uri.parse(oefening.url), "image/jpg")
                 startActivity(i)
             }
         }
 
         // Toont afspeelknop als oefening audiobestand is
         if (oefening.fileMimeType.startsWith("audio")){
-            mp.setDataSource("http://141.134.155.219:3000/oefeningen/files/" + oefening.fileUrl)
+            mp.setDataSource(oefening.url)
 
 
             ibAudio!!.visibility = View.VISIBLE
@@ -112,11 +112,11 @@ class FragmentOefening : Fragment() {
         // Toont video als oefening videobestand is
         if (oefening.fileMimeType.startsWith("video")){
 
-            var controller = MediaController(context)
+            val controller = MediaController(context)
             controller.setMediaPlayer(videoView)
             videoView!!.setMediaController(controller)
             videoView!!.visibility = View.VISIBLE
-            videoView!!.setVideoPath("http://141.134.155.219:3000/oefeningen/files/" + oefening.fileUrl)
+            videoView!!.setVideoPath(oefening.url)
             videoView!!.setOnPreparedListener {
                 controller.setAnchorView(videoView)
             }
@@ -124,7 +124,7 @@ class FragmentOefening : Fragment() {
 
         //Toon de feedbackfragment indien of de feedbackknop geklikt is
         buttonFeedback!!.setOnClickListener{
-            if (oefening!!.naam != "Geen oefening gevonden."){
+            if (oefening.naam != "Geen oefening gevonden."){
 
                 //Creeer nieuwe fragment
                 val oefeningFeedbackFragment = FragmentOefeningFeedback()

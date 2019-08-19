@@ -15,7 +15,7 @@ class KalenderFunction {
 
 
     fun Epoch2Calender(epochSeconds: String): Calendar {
-        val updatedate = Date(java.lang.Long.parseLong(epochSeconds))
+        val updatedate = Date(Long.parseLong(epochSeconds))
         val cal = Calendar.getInstance()
         cal.setTime(updatedate)
 

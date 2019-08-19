@@ -2,15 +2,15 @@ package com.groep4.mindfulness.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.fragments.*
 import com.groep4.mindfulness.interfaces.CallbackInterface
@@ -20,18 +20,14 @@ import com.groep4.mindfulness.model.Sessie
 import com.groep4.mindfulness.utils.ExtendedDataHolder
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import okhttp3.*
-import org.json.JSONArray
-import org.json.JSONObject
-import java.io.IOException
-import java.util.*
-
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), CallbackInterface {
 
     private val BACK_STACK_ROOT_TAG = "root_fragment"
-    private val client = OkHttpClient()
     lateinit var mAuth: FirebaseAuth
+    lateinit var firestore: FirebaseFirestore
+
     var gebruiker : Gebruiker = Gebruiker()
     var sessies: ArrayList<Sessie> = ArrayList()
 
@@ -40,6 +36,7 @@ class MainActivity : AppCompatActivity(), CallbackInterface {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
         Logger.addLogAdapter(AndroidLogAdapter())
 
         // Set gebruiker
@@ -90,32 +87,18 @@ class MainActivity : AppCompatActivity(), CallbackInterface {
      */
     fun getSessiesFromDB(): ArrayList<Sessie> {
         val tempSessies: ArrayList<Sessie> = ArrayList()
-
-        // HTTP Request sessies
-        val request = Request.Builder()
-                .url("http://141.134.155.219:3000/sessies")
-                .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("ERROR", "HTTP request failed: $e")
+        val sessieCollection = firestore.collection("Sessies")
+        sessieCollection.get().addOnSuccessListener { sessies ->
+            sessies.forEach{
+                tempSessies.add(Sessie(
+                        Integer.parseInt(it.get("id").toString()),
+                        it.get("naam") as String,
+                        it.get("beschrijving") as String,
+                        getOefeningen(it.get("id").toString()),
+                        it.get("sessieCode") as String
+                ))
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                tempSessies.clear()
-                val jsonarray = JSONArray(response.body()!!.string())
-                for (i in 0 until jsonarray.length()) {
-                    val jsonobject = jsonarray.getJSONObject(i)
-                    val sessieId = jsonobject.getInt("sessieId")
-                    val naam = jsonobject.getString("naam")
-                    val beschrijving = jsonobject.getString("beschrijving")
-                    val oefeningen = getOefeningen(sessieId)
-                    val sessieCode = jsonobject.getString("sessieCode")
-                    val sessie = Sessie(sessieId, naam, beschrijving, oefeningen, sessieCode)
-                    tempSessies.add(sessie)
-                }
-            }
-        })
+        }
         return tempSessies
     }
 
@@ -125,70 +108,36 @@ class MainActivity : AppCompatActivity(), CallbackInterface {
     fun getAangemeldeGebruiker() : Gebruiker{
         val gebruiker : Gebruiker = Gebruiker()
         val id = mAuth.currentUser!!.uid
-        val string1 = ("http://141.134.155.219:3000/users/" + id)
-        val string = "http://141.134.155.219:3000/users/yXQmL8IGSCbN15fzWw60t5udU2o2"
+        val gebruikerDoc = firestore.collection("Gebruikers").document(id)
 
-        // HTTP Request sessies
-        val request = Request.Builder()
-                .url(string1)
-                .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("ERROR", "HTTP request failed: $e")
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val jsonobject = JSONObject(response.body()!!.string())
-
-                gebruiker.uid = mAuth.currentUser!!.uid
-                gebruiker.regio = if (jsonobject.has("regio")) jsonobject.getString("regio") else ""
-                gebruiker.email = if (jsonobject.has("email")) jsonobject.getString("email") else ""
-                gebruiker.name = if (jsonobject.has("name")) jsonobject.getString("name") else ""
-                gebruiker.telnr = if (jsonobject.has("telnr")) jsonobject.getString("telnr") else ""
-                gebruiker.groepsnr = if (jsonobject.has("groepnr")) jsonobject.getInt("groepnr") else 0
-                gebruiker.sessieId = if (jsonobject.has("sessieid")) jsonobject.getInt("sessieid") else 1
-            }
-        })
+        gebruikerDoc.get().addOnSuccessListener {
+            Log.d("TAGSKE", it.toString())
+        }
         return gebruiker
     }
 
     /**
      * Oefeningen van sessie ophalen
      */
-    fun getOefeningen(sessieId: Int): ArrayList<Oefening>{
+    fun getOefeningen(sessieId: String): ArrayList<Oefening>{
         val oefeningen: ArrayList<Oefening> = ArrayList()
+        val oefeningenCollection = firestore.collection("Oefeningen")
 
-        // HTTP Request oefeningen
-        val request = Request.Builder()
-                /*.header("Authorization", "token abcd")*/
-                .url("http://141.134.155.219:3000/oefeningen/$sessieId")
-                .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("ERROR", "HTTP request failed: $e")
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val jsonarray = JSONArray(response.body()!!.string())
-                for (i in 0 until jsonarray.length()) {
-                    val jsonobject = jsonarray.getJSONObject(i)
-                    val oefeningenId = jsonobject.getInt("oefeningId")
-                    val naam = jsonobject.getString("naam")
-                    val beschrijving = jsonobject.getString("beschrijving")
-                    val sessieid = jsonobject.getInt("sessieId")
-                    val fileUrl = jsonobject.getString("fileName")
-                    val fileMimeType = jsonobject.getString("fileMimetype")
-                    val groepen = jsonobject.getString("groepen")
-
-                    if(groepen.contains(gebruiker!!.groepsnr.toString())) {
-                        val oefening: Oefening = Oefening(oefeningenId, naam, beschrijving, sessieid, fileUrl, fileMimeType, groepen)
-                        oefeningen.add(oefening)
-                    }
+        oefeningenCollection.get().addOnSuccessListener { collection ->
+            collection.forEach{
+                if(it.data.getValue("sId").toString() == sessieId.toString()){
+                    oefeningen.add(Oefening(
+                            it.data.getValue("id").toString(),
+                            it.data.getValue("naam") as String,
+                            it.data.getValue("beschrijving") as String,
+                            it.data.getValue("sId").toString(),
+                            it.data.getValue("mimeType") as String,
+                            it.data.getValue("groepen") as String,
+                            it.data.getValue("url") as String
+                    ))
                 }
             }
-        })
+        }
         return oefeningen
     }
 
@@ -211,18 +160,21 @@ class MainActivity : AppCompatActivity(), CallbackInterface {
     /**
      * gegevens van de gebruiker opslaan
      */
-    fun gegevensGebruikerOpslaan(body : FormBody, url : String) : String {
-        var response2 : String? = null
-        val thread = Thread(Runnable {
-            val mediaType: MediaType? = MediaType.parse("application/json; charset=utf-8")
-            val client: OkHttpClient = OkHttpClient()
-            val request: Request = Request.Builder().url(url).put(body).build()
-            val response = client.newCall(request).execute()
-            response2 = response.body().toString()
-        })
-        thread.start()
+    fun gegevensGebruikerOpslaan(){
+        val id = mAuth.currentUser!!.uid
+        val userDoc = firestore.collection("Gebruikers").document(id)
+
+        val user = hashMapOf(
+                "naam" to gebruiker.name,
+                "email" to gebruiker.email,
+                "telNr" to gebruiker.telnr,
+                "regio" to gebruiker.regio,
+                "groepnr" to gebruiker.groepsnr,
+                "sessieId" to gebruiker.sessieId
+        )
+
+        userDoc.set(user)
         getAangemeldeGebruiker()
-        return response2.orEmpty()
     }
 
     /**
@@ -269,18 +221,22 @@ class MainActivity : AppCompatActivity(), CallbackInterface {
     /**
      * Slaat de feedback op
      */
-    fun postFeedback(url: String, body:FormBody): String {
-        var response2 : String? = null
-        val thread = Thread(Runnable {
-            val mediaType: MediaType? = MediaType.parse("application/json; charset=utf-8")
-            val client: OkHttpClient = OkHttpClient()
-            //val body: RequestBody = RequestBody.create(mediaType, json)
-            val request: Request = Request.Builder().url(url).post(body).build()
-            val response = client.newCall(request).execute()
-            response2 = response.body().toString()
-        })
-        thread.start()
-        return response2.orEmpty()
+    fun postFeedback(id: String, beschrijving: String, score: String): String {
+        val feedbackCollection = firestore.collection("Feedback")
+        val feedback = hashMapOf(
+                "id" to id,
+                "beschrijving" to beschrijving,
+                "score" to score
+        )
+        var response = ""
+        feedbackCollection.add(feedback)
+                .addOnSuccessListener {
+                    response = "success"
+                }
+                .addOnFailureListener{
+                    response = "Fail"
+                }
+        return response
     }
 
 
@@ -289,15 +245,6 @@ class MainActivity : AppCompatActivity(), CallbackInterface {
      */
     fun sessieUnlocked() {
         gebruiker!!.sessieId += 1
-        val fromBodyBuilder = FormBody.Builder()
-        fromBodyBuilder.add("name", gebruiker!!.name)
-        fromBodyBuilder.add("regio", gebruiker!!.regio)
-        fromBodyBuilder.add("telnr", gebruiker!!.telnr)
-        fromBodyBuilder.add("uid", gebruiker!!.uid)
-        fromBodyBuilder.add("email", gebruiker!!.email)
-        fromBodyBuilder.add("groepnr", gebruiker!!.groepsnr.toString())
-        fromBodyBuilder.add("sessieid", gebruiker!!.sessieId.toString())
-        var url = "http://141.134.155.219:3000/users/" + gebruiker!!.uid
-        gegevensGebruikerOpslaan(fromBodyBuilder.build(), url)
+        gegevensGebruikerOpslaan()
     }
 }

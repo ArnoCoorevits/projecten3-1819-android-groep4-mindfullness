@@ -5,16 +5,18 @@ import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
 import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.groep4.mindfulness.R
+import com.groep4.mindfulness.model.Gebruiker
 import com.groep4.mindfulness.model.User
 import com.groep4.mindfulness.utils.LoginValidation
 import kotlinx.android.synthetic.main.activity_login.*
@@ -25,6 +27,7 @@ import kotlinx.android.synthetic.main.fragment_register.view.*
 class FragmentRegister : Fragment() {
 
     lateinit var mAuth: FirebaseAuth
+    lateinit var firestore: FirebaseFirestore
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -74,6 +77,7 @@ class FragmentRegister : Fragment() {
         else {
             showProgress(true)
             mAuth = FirebaseAuth.getInstance()
+            firestore = FirebaseFirestore.getInstance()
             mAuth.createUserWithEmailAndPassword(emailStr,passwordStr)
                     .addOnCompleteListener(activity!!){
                         task ->
@@ -82,20 +86,24 @@ class FragmentRegister : Fragment() {
                         activity!!.tv_register.visibility = View.INVISIBLE
                         if (task.isSuccessful()) {
 
-                            val user = User(nameStr , emailStr, "0")
-                            FirebaseDatabase.getInstance().getReference("Users")
-                                    .child(FirebaseAuth.getInstance().currentUser!!.uid)
-                                    .setValue(user).addOnCompleteListener(activity!!){
+                            val user = Gebruiker(nameStr , emailStr, 0, mAuth.currentUser!!.uid, "", "")
+                            val firebaseDatabase = firestore.collection("Gebruiker")
+                                    .document(FirebaseAuth.getInstance().currentUser!!.uid).set(user)
+                            //.getInstance().getReference("Users").child(FirebaseAuth.getInstance().currentUser!!.uid)
+
+                            firebaseDatabase.addOnCompleteListener(activity!!){
                                 task ->
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(context,"Account aangemaakt", Toast.LENGTH_SHORT).show()
-                                            val fm = fragmentManager
-                                            activity!!.tv_register.visibility = View.VISIBLE
-                                            activity!!.tv_register.text = resources.getString(R.string.registreer)
-                                            activity!!.tv_register.isClickable
-                                            fm!!.popBackStack()
-                                        }
-                                    }
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(context,"Account aangemaakt", Toast.LENGTH_SHORT).show()
+                                    val fm = fragmentManager
+                                    activity!!.tv_register.visibility = View.VISIBLE
+                                    activity!!.tv_register.text = resources.getString(R.string.registreer)
+                                    activity!!.tv_register.isClickable
+                                    fm!!.popBackStack()
+                                } else {
+                                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_SHORT).show()
+                                }
+                            }
 
 
                         } else {

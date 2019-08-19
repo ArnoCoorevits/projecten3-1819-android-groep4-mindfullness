@@ -1,20 +1,16 @@
 package com.groep4.mindfulness.adapters
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
 import android.util.SparseArray
-import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import com.groep4.mindfulness.fragments.FragmentOefening
-import com.groep4.mindfulness.fragments.FragmentSessie
 import com.groep4.mindfulness.model.Oefening
-import com.groep4.mindfulness.model.Sessie
 
+internal class OefeningenPagerAdapter(fm: FragmentManager,private val oefeningen: ArrayList<Oefening>) : FragmentPagerAdapter(fm) {
 
-internal class OefeningenPagerAdapter(fm: FragmentManager, val oefeningen: ArrayList<Oefening>) : FragmentPagerAdapter(fm) {
-
-    var registeredFragments: SparseArray<Fragment> = SparseArray()
+    private var registeredFragments: SparseArray<Fragment> = SparseArray()
 
 
     /**

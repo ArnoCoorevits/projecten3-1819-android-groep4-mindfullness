@@ -5,48 +5,46 @@ import android.os.Parcelable
 import android.util.Log
 
 class Oefening : Parcelable {
-    var oefenigenId: Int
-    var sessieId: Int
+    var id: String
+    var sessieId: String
     var naam: String
     var beschrijving: String
     var groepen: String
+    var url: String
 
 
     // File
-    var fileUrl: String
     var fileMimeType: String
 
 
-    constructor(id: Int, naam: String, beschrijving: String, sId: Int, url: String, mimeType: String, groepen: String){
-        this.oefenigenId = id
+    constructor(id: String, naam: String, beschrijving: String, sId: String, mimeType: String, groepen: String, url: String){
+        this.id = id
         this.naam = naam
         this.beschrijving = beschrijving
         this.sessieId = sId
-        this.fileUrl = url
         this.fileMimeType = mimeType
         this.groepen = groepen
+        this.url = url
     }
 
     private constructor(parcel: Parcel) {
-        this.oefenigenId = parcel.readInt()
-        //Log.d("TAG", parcel.readString())
-        this.sessieId = parcel.readInt()
+        this.id = parcel.readString()
+        this.sessieId = parcel.readString()
         this.naam = parcel.readString().orEmpty()
         this.beschrijving = parcel.readString().orEmpty()
-
-        this.fileUrl = parcel.readString().orEmpty()
         this.fileMimeType = parcel.readString().orEmpty()
         this.groepen = parcel.readString().orEmpty()
+        this.url = parcel.readString().orEmpty()
     }
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
-        dest?.writeInt(oefenigenId)
+        dest?.writeString(id)
         dest?.writeString(naam)
         dest?.writeString(beschrijving)
-        dest?.writeInt(sessieId)
-        dest?.writeString(fileUrl)
+        dest?.writeString(sessieId)
         dest?.writeString(fileMimeType)
         dest?.writeString(groepen)
+        dest?.writeString(url)
     }
 
     override fun describeContents(): Int {

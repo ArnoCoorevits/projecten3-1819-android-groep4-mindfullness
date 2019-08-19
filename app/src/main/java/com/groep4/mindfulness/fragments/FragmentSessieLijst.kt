@@ -1,15 +1,14 @@
 package com.groep4.mindfulness.fragments
 
-import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
 import com.badoualy.stepperindicator.StepperIndicator
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.activities.MainActivity
@@ -70,13 +69,13 @@ class FragmentSessieLijst : Fragment() {
                     val sessieFragmentCurrent: FragmentSessie = pagerAdapter.getRegisteredFragment(position) as FragmentSessie
                     val sessieFragmentPrevious: FragmentSessie = pagerAdapter.getRegisteredFragment(previousPage) as FragmentSessie
                     if (previousPage <= position) {
-                        if (main.gebruiker!!.sessieId >= sessies[position].sessieId){
+                        if (main.gebruiker!!.sessieId >= sessies[position].id){
                         sessieFragmentCurrent.drive(true)
                         sessieFragmentCurrent.fireworkAnimationSmall()
                         sessieFragmentCurrent.fireworkAnimationBig()}
                     }
                     else {
-                        if (main.gebruiker!!.sessieId >= sessies[position].sessieId) {
+                        if (main.gebruiker!!.sessieId >= sessies[position].id) {
                             sessieFragmentCurrent.drive(false)
                             sessieFragmentPrevious.fireworkAnimationSmall()
                         }
@@ -94,9 +93,9 @@ class FragmentSessieLijst : Fragment() {
                 }
 
                 // Als sessie locked is, cardview grijs maken
-                if ( main.gebruiker!!.sessieId < sessies[position].sessieId){
+                if ( main.gebruiker!!.sessieId < sessies[position].id){
                     var sessieFragmentCurrent: FragmentSessie = pagerAdapter.getRegisteredFragment(position) as FragmentSessie
-                    sessieFragmentCurrent.cv_sessie.setCardBackgroundColor(Color.parseColor("#818181"))
+                    sessieFragmentCurrent.cv_sessie.setBackgroundColor(Color.parseColor("#818181"))
                 }
             }
         })

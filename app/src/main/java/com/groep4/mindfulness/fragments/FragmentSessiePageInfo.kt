@@ -1,11 +1,11 @@
 package com.groep4.mindfulness.fragments
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.model.Sessie
 import kotlinx.android.synthetic.main.fragment_sessie_page_info.view.*

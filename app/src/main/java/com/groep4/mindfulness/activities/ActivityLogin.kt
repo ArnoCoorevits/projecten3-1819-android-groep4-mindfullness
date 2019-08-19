@@ -2,26 +2,19 @@ package com.groep4.mindfulness.activities
 
 import android.content.Intent
 import android.os.Bundle
-
-import android.support.v7.app.AppCompatActivity
-
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.fragments.FragmentLogin
 import com.groep4.mindfulness.fragments.FragmentRegister
-import kotlinx.android.synthetic.main.activity_login.*
-import com.google.firebase.auth.FirebaseUser
-
-
 
 
 class ActivityLogin : AppCompatActivity(){
 
-    lateinit var mLoginFragment: FragmentLogin
-    lateinit var mRegisterFragment: FragmentRegister
-    var tvRegister: TextView?=null
+    private lateinit var mLoginFragment: FragmentLogin
+    private lateinit var mRegisterFragment: FragmentRegister
+    private var tvRegister: TextView?=null
     lateinit var  mAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,12 +24,10 @@ class ActivityLogin : AppCompatActivity(){
         initFragment()
         showLoginFragment()
 
-        tvRegister = findViewById(R.id.tv_register) as TextView
+        tvRegister = findViewById(R.id.tv_register)
 
         tvRegister?.setOnClickListener {
-
             showRegisterFragment()
-
         }
 
     }
@@ -79,7 +70,7 @@ class ActivityLogin : AppCompatActivity(){
     public override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = mAuth.getCurrentUser()
+        val currentUser = mAuth.currentUser
 
         if (currentUser != null) {
             val intent = Intent(this, MainActivity::class.java)

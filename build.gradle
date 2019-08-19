@@ -27,8 +27,8 @@ task clean(type: Delete) {
 }
 
 // Niet weg doen aub, dit is voor de pipeline errors
-buildScan { 
+/*buildScan {
     termsOfServiceUrl = 'https://gradle.com/terms-of-service'
     termsOfServiceAgree = 'yes' 
-}
+}*/
 

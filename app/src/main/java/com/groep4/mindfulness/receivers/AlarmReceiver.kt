@@ -1,19 +1,11 @@
 package com.groep4.mindfulness.receivers
 
-import android.app.Notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
 import com.groep4.mindfulness.services.NotificationService
-import android.app.NotificationManager
-import android.app.NotificationChannel
-import android.graphics.Color
-import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationCompat.PRIORITY_MIN
-import com.groep4.mindfulness.R
 
 
 class AlarmReceiver : BroadcastReceiver() {

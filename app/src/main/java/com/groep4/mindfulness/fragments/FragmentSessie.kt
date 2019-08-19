@@ -5,17 +5,16 @@ import android.media.MediaPlayer
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.app.Fragment
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.CardView
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.view.animation.Animation
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.cardview.widget.CardView
+import androidx.fragment.app.Fragment
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.interfaces.CallbackInterface
 import com.groep4.mindfulness.activities.MainActivity
@@ -143,7 +142,7 @@ class FragmentSessie : Fragment() {
         //Open een sessie indien erop geklikt is
         cv_sessie.setOnClickListener{
             if (sessie!!.naam != "Geen sessie gevonden."){
-                if (sessie!!.sessieId == 1){
+                if (sessie!!.id == 1){
 
                     //Creeer nieuwe fragment
                     val sessiePageFragment = FragmentSessiePage()
@@ -155,7 +154,7 @@ class FragmentSessie : Fragment() {
                     // Launch fragment met callback naar activity
                     callback?.setFragment(sessiePageFragment, true)
                 }
-                else if(gebruiker!!.sessieId+1 > sessie!!.sessieId) {
+                else if(gebruiker!!.sessieId+1 > sessie!!.id) {
                     //creeer nieuwe fragment
                     val sessiePageFragment = FragmentSessiePage()
                     val bundle = Bundle()
@@ -165,7 +164,7 @@ class FragmentSessie : Fragment() {
 
                     // Launch fragment met callback naar activity
                     callback?.setFragment(sessiePageFragment, true)
-                } else if(gebruiker!!.sessieId+1 < sessie!!.sessieId)
+                } else if(gebruiker!!.sessieId+1 < sessie!!.id)
                     Toast.makeText(context, "De sessie is nog niet toegankelijk", Toast.LENGTH_SHORT).show()
                 else {
 

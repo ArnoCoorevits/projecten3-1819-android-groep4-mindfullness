@@ -1,10 +1,12 @@
 package com.groep4.mindfulness.fragments
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.tabs.TabLayout
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.adapters.SessiePagerAdapter
 import com.groep4.mindfulness.model.Sessie
@@ -35,9 +37,10 @@ class FragmentSessiePage : Fragment() {
         }
 
         val fragmentAdapter = SessiePagerAdapter(activity!!.supportFragmentManager, sessie, page)
-        view.sessie_viewpager.adapter = fragmentAdapter
-        view.sessie_tabs.setupWithViewPager(view.sessie_viewpager)
-
+        val viewpager = view.sessie_viewpager as ViewPager
+        val tablayout = view.sessie_tabs as TabLayout
+        viewpager.adapter = fragmentAdapter
+        tablayout.setupWithViewPager(viewpager)
         return view
     }
 }

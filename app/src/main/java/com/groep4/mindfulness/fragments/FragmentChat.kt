@@ -1,30 +1,29 @@
 package com.groep4.mindfulness.fragments
 
-
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ListView
-import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.firebase.ui.database.FirebaseListAdapter
-import com.firebase.ui.database.FirebaseListOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.groep4.mindfulness.R
-import com.groep4.mindfulness.interfaces.CallbackInterface
+import com.groep4.mindfulness.activities.MainActivity
 import com.groep4.mindfulness.model.Message
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_chat.view.*
-import java.text.DateFormat
+import java.time.LocalDateTime
+import java.util.*
+import kotlin.collections.ArrayList
 
 class FragmentChat : Fragment(){
 
@@ -33,9 +32,11 @@ class FragmentChat : Fragment(){
     private var btnSend: View? = null
     private var editText: EditText? = null
     //Firebase objecten
-    private var adapter: FirebaseListAdapter<Message>? = null
-    private var dbInstance : DatabaseReference? = FirebaseDatabase.getInstance().reference.child("Chat")
+    private var adapter: ArrayAdapter<String>? = null
+    private var firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
     private var currentUserId: FirebaseUser? = FirebaseAuth.getInstance().currentUser!!
+    private var messages : MutableList<Message> = mutableListOf()
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -53,27 +54,26 @@ class FragmentChat : Fragment(){
 
         btnSend = view.findViewById(R.id.btn_chat_send)
 
+        displayChatMessages(view)
+
         /** Bericht sturen naar de database met als sleutel het userid van de huidig ingelogde gebruiker. */
         btnSend!!.setOnClickListener {
             editText = view.findViewById(R.id.msg_type)
-            dbInstance!!.child(currentUserId!!.uid).push().setValue(
-                    Message(editText!!.text.toString(),
-                            FirebaseAuth.getInstance().currentUser!!.displayName!!))
+            val naam = (activity as MainActivity)!!.gebruiker.name
+            var message = Message()
+            message.content = editText!!.text.toString()
+            message.gelezen = false
+            message.messageTime = Date().time
+            message.messageUser = naam.toString()
+            //var map = mapOf("messages" to messagesFirebase)
+            Log.d("HEEEEEEEEEEEEEE", currentUserId!!.email!!.toString())
+            firestore!!.collection("Chat").document(currentUserId!!.email!!)
+                    .collection("messages").document((this.messages.size+1).toString()).set(message)
             editText!!.setText("")
+            displayChatMessages(view)
         }
-        displayChatMessages(view)
 
         return view
-    }
-
-    override fun onStart() {
-        super.onStart()
-        adapter!!.startListening()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        adapter!!.stopListening()
     }
 
     /**
@@ -83,34 +83,36 @@ class FragmentChat : Fragment(){
 
         listView = view.findViewById<View>(R.id.list_msg) as ListView
 
-        val options: FirebaseListOptions<Message> = FirebaseListOptions.Builder<Message>()
-                .setLayout(R.layout.message)
-                .setQuery(dbInstance!!.child(currentUserId!!.uid), Message::class.java)
-                .setLifecycleOwner(this)
-                .build()
+        this.messages = mutableListOf()
 
+        firestore.collection("Chat").document(currentUserId!!.email!!).collection("messages").get().addOnCompleteListener { task ->
+            Log.d("LENGTH", task.result!!.size().toString())
+            for(document in task.result!!) {
+                Log.d("HAAAAAAA", document.toString())
+                Log.d("CONTENT", document["content"].toString())
+                Log.d("GELEZEN", document["gelezen"].toString())
+                Log.d("MESSAGETIME", document["messageTime"].toString())
+                Log.d("MESSAGEUSER", document["messageUser"].toString())
 
-        adapter = object : FirebaseListAdapter<Message>(options) {
-            override fun populateView(v: View, model: Message, position: Int) {
-                val messageText = v.findViewById(R.id.message_text) as TextView
-                val messageUser = v.findViewById(R.id.message_user) as TextView
-                val messageTime = v.findViewById(R.id.message_time) as TextView
+                var message = Message()
+                message.content = document["content"].toString()
 
-                val messageBackground = v.findViewById(R.id.message_background) as RelativeLayout
-                messageBackground.setBackgroundColor(Color.WHITE)
-                /**
-                 * Als het bericht in de db niet matcht met de huidige gebruiker, zet de achtergrond blauw.
-                 * */
-                if(model.messageUser != currentUserId!!.displayName!!){
-                    messageBackground.setBackgroundColor(Color.parseColor("#9BBBD8"))
-                }
+                message.gelezen = document["gelezen"].toString().equals("true")
+                message.messageTime = document["messageTime"].toString().toLong()
+                message.messageUser = document["messageUser"].toString()
+                this.messages.add(this.messages.count(), message)
+            }
+            this.messages.sortBy { message -> message.messageTime }
 
-                messageText.text = model.content
-                messageTime.text = DateFormat.getDateInstance().format(model.messageTime)
-                messageUser.text = model.messageUser
-            }}
+            var listItems = arrayOfNulls<String>(this.messages.size)
+            for(i in 0 until this.messages.size) {
+                listItems[i] = this.messages[i].content + " - " + this.messages[i].messageUser
+            }
 
-        listView!!.adapter = adapter
+            adapter =  ArrayAdapter(context!!, android.R.layout.simple_list_item_1, listItems.requireNoNulls())
+
+            listView!!.adapter = adapter
+        }
     }
 
 

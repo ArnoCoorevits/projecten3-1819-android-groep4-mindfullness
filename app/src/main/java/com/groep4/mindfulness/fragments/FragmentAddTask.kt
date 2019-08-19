@@ -2,15 +2,14 @@ package com.groep4.mindfulness.fragments
 
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.database.DBHelper
 import com.groep4.mindfulness.utils.KalenderFunction
@@ -19,7 +18,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class FragmentAddTask : Fragment(), com.wdullaer.materialdatetimepicker.date.DatePickerDialog.OnDateSetListener {
-
 
     lateinit var mydb: DBHelper
     lateinit var dpd: com.wdullaer.materialdatetimepicker.date.DatePickerDialog
@@ -39,7 +37,7 @@ class FragmentAddTask : Fragment(), com.wdullaer.materialdatetimepicker.date.Dat
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val view:View=inflater!!.inflate(R.layout.fragment_kalender_add,container,false)
+        val view:View=inflater.inflate(R.layout.fragment_kalender_add,container,false)
 
         // Als er een Task moet worden bijgewerkt word dit true
         isUpdate = arguments!!.getBoolean("isUpdate", false)
@@ -48,7 +46,7 @@ class FragmentAddTask : Fragment(), com.wdullaer.materialdatetimepicker.date.Dat
         dateFinal = todayDateString()
         val your_date = Date()
         val cal = Calendar.getInstance()
-        cal.setTime(your_date)
+        cal.time = your_date
         startYear = cal.get(Calendar.YEAR)
         startMonth = cal.get(Calendar.MONTH)
         startDay = cal.get(Calendar.DAY_OF_MONTH)
@@ -67,12 +65,12 @@ class FragmentAddTask : Fragment(), com.wdullaer.materialdatetimepicker.date.Dat
 
         val doneButton = view.findViewById(R.id.doneAddTask) as ImageView
         doneButton.setOnClickListener {
-            doneAddTask(view!!)
+            doneAddTask(view)
         }
 
         val dateButton = view.findViewById(R.id.task_date) as TextView
         dateButton.setOnClickListener {
-            showStartDatePicker(view!!)
+            showStartDatePicker(view)
         }
 
         return view
@@ -84,7 +82,7 @@ class FragmentAddTask : Fragment(), com.wdullaer.materialdatetimepicker.date.Dat
 
         mydb = DBHelper(activity!!.applicationContext)
 
-        if (isUpdate!!) {
+        if (isUpdate) {
             init_update()
         }
     }
@@ -94,10 +92,10 @@ class FragmentAddTask : Fragment(), com.wdullaer.materialdatetimepicker.date.Dat
      */
     fun init_update() {
 
-        id = arguments!!.getString("id")
+        id = arguments!!.getString("id")!!
 
         //title veranderen toolbar
-        toolbar_task_add_title.setText("Update")
+        toolbar_task_add_title.text = "Update"
         doAsync {
         val task = mydb.getDataSpecific(id)
 

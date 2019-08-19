@@ -12,9 +12,9 @@ class NoScrollListView : ListView {
     constructor(ctx: Context, attrs: AttributeSet, defStyle : Int) : super(ctx, attrs, defStyle)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val heightMeasureSpec_custom = MeasureSpec.makeMeasureSpec(
+        val heightMeasureSpecCustom = MeasureSpec.makeMeasureSpec(
                 Integer.MAX_VALUE shr(2) , MeasureSpec.AT_MOST)
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec_custom)
+        super.onMeasure(widthMeasureSpec, heightMeasureSpecCustom)
         var params: ViewGroup.LayoutParams = layoutParams
         params.height = measuredHeight
     }

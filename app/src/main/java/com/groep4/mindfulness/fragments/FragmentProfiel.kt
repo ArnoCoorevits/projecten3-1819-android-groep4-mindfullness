@@ -1,16 +1,15 @@
 package com.groep4.mindfulness.fragments
 
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
-import android.support.design.widget.TabLayout
-import android.support.v4.app.Fragment
-import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
-import android.util.Log
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.tabs.TabLayout
+import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
 import android.view.*
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.adapters.ViewPagerAdapter
 import kotlinx.android.synthetic.main.fragment_profiel.view.*
+import kotlinx.android.synthetic.main.fragment_sessie_page.view.*
 
 class FragmentProfiel: Fragment() {
 
@@ -30,12 +29,10 @@ class FragmentProfiel: Fragment() {
         // adding fragments
         fragmentAdapter!!.addFragment(FragmentProfielInfo(),"Info")
         fragmentAdapter!!.addFragment(FragmentProfielOverzicht(), "Voortgang")
-        Log.d("aa", "mew fragmentadatpor")
 
         //adapter setup
-        view.viewpager_id.adapter = fragmentAdapter
-        view.tablayout_id.setupWithViewPager(view.viewpager_id)
-
+        viewPager.adapter = fragmentAdapter
+        tabLayout!!.setupWithViewPager(viewPager)
         return view
     }
 

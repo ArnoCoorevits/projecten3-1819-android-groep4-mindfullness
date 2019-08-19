@@ -4,14 +4,14 @@ import android.os.Parcel
 import android.os.Parcelable
 
 class Sessie : Parcelable {
-    var sessieId: Int
+    var id: Int
     var naam: String
     var beschrijving: String
     var oefeningen: ArrayList<Oefening>? = null
-    var sessieCode: String
+    var sessieCode: String?
 
     constructor(id: Int, naam: String, beschrijving: String, oefeningen: ArrayList<Oefening>?, sessieCode: String){
-        this.sessieId = id
+        this.id = id
         this.naam = naam
         this.beschrijving = beschrijving
         this.oefeningen = oefeningen
@@ -19,7 +19,7 @@ class Sessie : Parcelable {
     }
 
     private constructor(parcel: Parcel) {
-        this.sessieId = parcel.readInt()
+        this.id = parcel.readInt()
         this.naam = parcel.readString()
         this.beschrijving = parcel.readString()
         this.sessieCode = parcel.readString()
@@ -27,7 +27,7 @@ class Sessie : Parcelable {
     }
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
-        dest?.writeInt(sessieId)
+        dest?.writeInt(id)
         dest?.writeString(naam)
         dest?.writeString(beschrijving)
         dest?.writeTypedList(oefeningen)

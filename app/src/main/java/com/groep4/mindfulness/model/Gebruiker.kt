@@ -13,7 +13,7 @@ class Gebruiker : Parcelable {
     var sessieId : Int = 1
 
 
-    constructor(uid : String, email : String, regio : String, telnr : String, groepsnr : Int, name : String, sessieId : Int) {
+    constructor(name: String, email: String, groepsnr: Int, uid: String, telnr: String, regio: String) {
         this.email = email
         this.uid = uid
         this.regio = regio

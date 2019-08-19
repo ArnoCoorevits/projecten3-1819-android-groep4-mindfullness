@@ -14,8 +14,6 @@ import java.util.*
 
 
 class DBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, 3) {
-
-
     val data: Cursor
         get() {
             val db = this.readableDatabase

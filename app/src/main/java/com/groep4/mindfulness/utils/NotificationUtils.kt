@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
-import android.widget.Toast
 import com.groep4.mindfulness.receivers.AlarmReceiver
 import java.util.*
 

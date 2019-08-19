@@ -2,13 +2,12 @@ package com.groep4.mindfulness.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import com.groep4.mindfulness.R
 import com.groep4.mindfulness.interfaces.CallbackInterface
 import com.groep4.mindfulness.activities.MainActivity

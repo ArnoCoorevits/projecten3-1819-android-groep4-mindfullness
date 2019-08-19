@@ -1,17 +1,9 @@
 package com.groep4.mindfulness.fragments
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.annotation.TargetApi
-import android.app.job.JobScheduler
 import android.content.Context
 import android.database.Cursor
 import android.os.AsyncTask
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.NestedScrollView
-import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,14 +18,16 @@ import kotlinx.android.synthetic.main.fragment_kalender.view.*
 import java.util.ArrayList
 import java.util.HashMap
 import android.content.DialogInterface
-import android.os.Build
-import android.support.v7.app.AlertDialog
+import android.util.Log
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.Fragment
 import com.google.firebase.database.*
 import com.groep4.mindfulness.activities.MainActivity
 import com.groep4.mindfulness.model.Gebruiker
 import com.groep4.mindfulness.model.Task
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.fragment_kalender.*
 
 
 class FragmentKalender : Fragment()
@@ -137,12 +131,9 @@ class FragmentKalender : Fragment()
 
         override fun onPreExecute() {
             super.onPreExecute()
-
             todayList.clear()
             tomorrowList.clear()
             upcomingList.clear()
-
-
         }
 
         override fun doInBackground(vararg args: String): String {
@@ -229,11 +220,18 @@ class FragmentKalender : Fragment()
     fun loadFirebaseDataList(){
         ref = FirebaseDatabase.getInstance().getReference("Announcement")
 
+        Log.d("LOADFIREBASE", "HOI")
+        Log.d("LOADFIREBASE", ref.toString())
+
+
         ref.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if(dataSnapshot!!.exists()){
+                    Log.d("LOADFIREBASE", "datasnapshot exists")
                     for (data in dataSnapshot.children){
+                        Log.d("LOADFIREBASE", data.toString())
                         val _task = data.getValue(Task::class.java)
+                        Log.d("LOADFIREBASE", _task.toString())
                         try{
                             val cursordb:Cursor = mydb.getDataSpecific(_task!!._key)
 
