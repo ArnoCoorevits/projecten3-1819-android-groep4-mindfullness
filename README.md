@@ -29,3 +29,6 @@ You will need to have Android Studio installed and an android device or android 
 * Set up a daily reminder notification
 * Add tasks to your personal calendar
 * Chat with the psychologists
+## Testaccount
+email: test@test.com
+password: Wachtwoord123
